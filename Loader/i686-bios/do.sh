@@ -30,6 +30,9 @@ case $1 in
     "c" |"cleanup")
         $I686_PATH/src-sh/cleanup.sh ${@:2:"$#"}
         ;;
+    "d" | "dump")
+        $I686_PATH/src-sh/dump.sh ${@:2:"$#"}
+        ;;
     "fs" | "make-bootfs")
         $I686_PATH/src-sh/makefs.sh ${@:2:$#}
         ;;
