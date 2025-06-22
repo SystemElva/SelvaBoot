@@ -22,7 +22,7 @@ display_help() {
 
 case $1 in
     "b" | "build")
-        $I686_PATH/src-sh/build.sh ${@:2:"$#"}
+        "$I686_PATH"/src-sh/build.sh "${@:2:$#}"
         ;;
     "q" | "qemu")
         $I686_PATH/src-sh/run-qemu.sh ${@:2:"$#"}
@@ -52,7 +52,7 @@ case $1 in
         $I686_PATH/src-sh/cleanup-all.sh ${@:2:"$#"}
         ;;
     "h" | "help")
-        display_help ${@:2:"$#"}
+        display_help "${@:2:$#}"
         ;;
     *)
         echo "Unknown action. Try:"
