@@ -7,3 +7,4 @@
 %include "filesystem/fat12/open_filesystem.asm"
 %include "filesystem/fat12/read_file.asm"
 %include "filesystem/fat12/search_item.asm"
+%include "filesystem/fat12/walk_cluster_chain.asm"
