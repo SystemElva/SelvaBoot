@@ -38,7 +38,7 @@ nasm -o $BOOTSECTOR_OBJECTS/object.bin \
 
 nasm -o $CODE_PARTITION_OBJECTS/object.bin \
     $CODE_PARTITION_SOURCES/main.asm \
-    -i $CODE_PARTITION_SOURCES
+    -i "$CODE_PARTITION_SOURCES"
 
 OUTPUT_FILE=$OUTPUT_DIRECTORY/elvaboot-$EXECUTION_TIME.img
 
@@ -46,6 +46,6 @@ HD_DISKETTE_BYTES=$((2880*512)) # 2880 sectors of 512 bytes each
 truncate $OUTPUT_FILE --size=$HD_DISKETTE_BYTES
 
 dd status=none conv=notrunc cbs=512 if=$BOOTSECTOR_OBJECTS/object.bin of=$OUTPUT_FILE
-dd status=none conv=notrunc cbs=512 if=$CODE_PARTITION_OBJECTS/object.bin of=$OUTPUT_FILE oseek=1
-dd status=none conv=notrunc cbs=512 if=$BOOTFS_PARTITION/fat12.img of=$OUTPUT_FILE oseek=64
+dd status=none conv=notrunc cbs=512 if=$CODE_PARTITION_OBJECTS/object.bin of=$OUTPUT_FILE seek=1
+dd status=none conv=notrunc cbs=512 if=$BOOTFS_PARTITION/fat12.img of=$OUTPUT_FILE seek=64
 
