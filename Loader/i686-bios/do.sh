@@ -8,7 +8,7 @@ if [[ "$#" == "0" ]];
 then
     echo "Usage:   $ $0 <action> [flags]"
     echo "Example: $ $0 help"
-    exit -1
+    exit 1 # 0 = success, 1-255 = failure
 fi
 
 display_help() {
@@ -25,7 +25,7 @@ case $1 in
         "$I686_PATH"/src-sh/build.sh "${@:2:$#}"
         ;;
     "q" | "qemu")
-        $I686_PATH/src-sh/run-qemu.sh ${@:2:"$#"}
+        "$I686_PATH"/src-sh/run-qemu.sh "${@:2:$#}"
         ;;
     "c" |"cleanup")
         $I686_PATH/src-sh/cleanup.sh ${@:2:"$#"}
@@ -37,7 +37,7 @@ case $1 in
         $I686_PATH/src-sh/makefs.sh ${@:2:$#}
         ;;
     "bt" | "build-tests")
-        $I686_PATH/src-sh/tests/build.sh ${@:2:$#}
+        $I686_PATH/src-sh/tests/build.sh "${@:2:$#}"
         ;;
     "lt" | "list-test-builds")
         $I686_PATH/src-sh/tests/list.sh ${@:2:$#}
@@ -48,8 +48,8 @@ case $1 in
     "ct" | "cleanup-tests")
         $I686_PATH/src-sh/tests/cleanup.sh ${@:2:$#}
         ;;
-    "ca" |"cleanup-all")
-        $I686_PATH/src-sh/cleanup-all.sh ${@:2:"$#"}
+    "ca" | "cleanup-all")
+        "$I686_PATH"/src-sh/cleanup-all.sh "${@:2:$#}"
         ;;
     "h" | "help")
         display_help "${@:2:$#}"
