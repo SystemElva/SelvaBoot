@@ -4,10 +4,10 @@ PARTITION_IDENTIFIER equ 0x9e
 bits 16
 org 0x7c00
 entry:
-    mov bx, 0x7e00
-    mov ss, bx
-    mov bp, 512
-    mov sp, 512
+    mov ebx, 0x800
+    mov ss, ebx
+    mov ebp, 0x2000
+    mov esp, ebp
     push dx
 
     push bp
@@ -154,7 +154,7 @@ load_partition:
 
 
 jump_to_partition:
-    jmp 0xa000
+    jmp 0xa00:0
     cli
     hlt
 

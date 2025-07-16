@@ -1,83 +1,65 @@
 
-; DO NOT INCLUDE OTHER FILES HERE; DO THAT AT THE BOTTOM OF THIS FILE
-
+section .text
 bits 16
-org 0xa000
 
-stage2_start:
-.setup_stack:
-    mov     ebx,                0x800
-    mov     ss,                 ebx
-    mov     ebp,                0x2000
-    mov     esp,                ebp
+global asm_write_text
 
-    sub     esp,                256
-    mov     esi,                esp
+; write_text:
+;   Put a NUL-terminated character string onto the display
+;   using the BIOS functions at INT 0x10.
+;
+; Arguments:
+;   [FURTHEST FROM EBP]
+;     3.  U32       color_codes (Only lower 8 bits used)
+;     2.  U32       start_cell
+;     1.  U32       start_line
+;     0.  Ptr32     string
+;  [NEAREST TO EBP]
+;
+; Return Value:
+;   N/A
+asm_write_text:
+.prolog:
+    pushad
 
-    ; Save the origin disk identifier
-    mov     [esi],              dx
+    mov ah, 0x00
+    mov al, 3
+    int 0x10
 
-    ; Reset display
-    mov     ah,                 0x00
-    mov     al,                 0x03
-    int     0x10
+.setup_character_loop:
+    xor edi, edi
 
-.initialize:
-    ; Setup the stack of loaded sectors.
-    mov     [SECTOR_STACK_HEIGHT],              word 0
+.character_loop:
+    ; Check for primary exit condition (NUL character)
+    mov ebx, [ebp - 16]
+    add ebx, edi
+    mov cl, [ebx]
+    cmp cl, 0
+    je .epilog
 
-.load_partition:
-    mov     edx,                esi
-    add     edx,                (256 - (64 + 16))
+    ; Move Cursor
+    mov ah, 0x02            ; Interrupt Function (move cursor)
+    mov bh, 0               ; Display Page
+    mov dx, [ebp - 8]       ; Start Column
+    add dx, di
+    mov dh, [ebp - 12]      ; Line
+    int 0x10
 
-    push    ebp
-    mov     ebp,                esp
-    push    edx
-    push    word [esi]
-    push    word 1
-    call    disk_open_partition
-    mov     esp,                ebp
-    pop     ebp
+    ; Check for secondary exit condition (line end reached)
+    cmp dl, 80
+    jae .epilog
 
-.open_filesystem:
-    mov ebx, esi
-    add ebx, (256 - 128)
+    ; Display the character
+    mov ah, 0x09
+    mov al, cl
+    mov bh, 0
+    mov bl, [ebp - 4]
+    mov cx, 1
+    int 0x10
 
-    push    ebp
-    mov     ebp,                esp
-    push    edx                                 ; Partition
-    push    ebx                                 ; Buffer for filesystem
-    call    open_filesystem
-    mov     esp,                ebp
-    pop     ebp
+    inc edi
+    jmp .character_loop
 
-    cmp     eax,                0
-    je      .unknown_filesystem
-
-    mov     edx,                esi
-    add     edx,                (256 - (128 + 16 + 32))
-
-    push    ebp
-
-    mov     ebp,                esp
-    push    ebx                                 ; Filesystem
-    push    edx                                 ; Buffer for file
-    push    dword text.config_path              ; Path to file to load
-    call    dword open_file
-    mov     esp,                ebp
-    pop     ebp
-
-    cli
-    hlt
-
-.unimplemented:
-    push    dword text.unimplemented
-    jmp     crash
-
-.unknown_filesystem:
-    push    dword text.boot_partition_filesystem_not_implemented
-    jmp     crash
-
-
-
-%include "all.asm"
+.epilog:
+    popad
+    ret
