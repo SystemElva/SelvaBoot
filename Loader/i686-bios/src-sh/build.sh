@@ -42,7 +42,8 @@ cd $I686_PATH/.build/modules/code-partition
 nasm \
     $CODE_PARTITION/src-asm/main.asm \
     -f elf32 \
-    -o assembly.o
+    -o assembly.o \
+    -I $CODE_PARTITION/src-asm
 
 zig build-obj \
     "$CODE_PARTITION/src-zig/main.zig" \

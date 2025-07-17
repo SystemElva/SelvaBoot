@@ -8,7 +8,10 @@ entry:
     mov ss, ebx
     mov ebp, 0x2000
     mov esp, ebp
-    push dx
+
+    xor eax, eax
+    mov ax, dx
+    push eax
 
     push bp
     mov bp, sp
@@ -19,7 +22,7 @@ entry:
     cmp ax, 0xff
     je display_error.partition_not_found
 
-    pop dx
+    mov dx, [bp - 4]
     push bp
     mov bp, sp
     push ax
@@ -28,6 +31,7 @@ entry:
     mov sp, bp
     pop bp
 
+    mov dx, [bp - 4]
     jmp jump_to_partition
 
 find_partition:
@@ -154,7 +158,12 @@ load_partition:
 
 
 jump_to_partition:
-    jmp 0xa00:0
+    pop eax
+    push ebp
+    mov ebp, esp
+    push eax
+    call 0xa00:0
+
     cli
     hlt
 

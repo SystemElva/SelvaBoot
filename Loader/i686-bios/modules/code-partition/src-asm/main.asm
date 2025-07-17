@@ -20,18 +20,17 @@ global asm_write_text
 ;   N/A
 asm_write_text:
 .prolog:
-    pushad
+    push ebp
+    mov ebp, esp
 
-    mov ah, 0x00
-    mov al, 3
-    int 0x10
+    pushad
 
 .setup_character_loop:
     xor edi, edi
 
 .character_loop:
     ; Check for primary exit condition (NUL character)
-    mov ebx, [ebp - 16]
+    mov ebx, [ebp + 0x08]
     add ebx, edi
     mov cl, [ebx]
     cmp cl, 0
@@ -40,9 +39,9 @@ asm_write_text:
     ; Move Cursor
     mov ah, 0x02            ; Interrupt Function (move cursor)
     mov bh, 0               ; Display Page
-    mov dx, [ebp - 8]       ; Start Column
+    mov dx, [ebp + 0x10]       ; Start Column
     add dx, di
-    mov dh, [ebp - 12]      ; Line
+    mov dh, [ebp + 0x0c]      ; Line
     int 0x10
 
     ; Check for secondary exit condition (line end reached)
@@ -53,7 +52,7 @@ asm_write_text:
     mov ah, 0x09
     mov al, cl
     mov bh, 0
-    mov bl, [ebp - 4]
+    mov bl, [ebp + 0x14]
     mov cx, 1
     int 0x10
 
@@ -62,4 +61,11 @@ asm_write_text:
 
 .epilog:
     popad
+
+    mov esp, ebp
+    pop ebp
     ret
+
+%include "disk.asm"
+%include "display.asm"
+
