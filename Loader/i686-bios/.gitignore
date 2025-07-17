@@ -49,3 +49,6 @@
 
 ## VSCodium & Visual Studio Code - files
 .vscode/
+
+## Convenience folder for withholding data
+.private/
