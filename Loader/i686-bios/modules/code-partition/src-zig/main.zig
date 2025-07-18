@@ -1,41 +1,39 @@
+// SPDX-License-Identifier: MPL-2.0
+
 /// This function must be the topmost code in 'main.zig'!
 export fn selvaboot_main(disk_identifier: u32) callconv(.c) noreturn {
-    asm_reset_display(3);
-
-    asm_load_sector(
-        @ptrFromInt(0x7e00),
-        @as(u32, 0),
-        disk_identifier,
+    assembly.asm_reset_display(3);
+    assembly.asm_set_background(0x40);
+    assembly.asm_write_text(
+        &"ElvaBoot"[0],
+        3,
+        1,
+        0x0f,
     );
-    asm_set_background(0x40);
-
-    asm_write_text(
-        &"Message from the bootloader's Zig part"[0],
-        12,
-        21,
-        0x4f,
+    assembly.memset(
+        @ptrFromInt(0x7c00),
+        0xff,
+        512,
     );
+
+    const boot_disk = Disk.init(@intCast(disk_identifier)) catch {
+        while (true) {}
+    };
+
+    var partition_index: usize = 0;
+    while (partition_index < 4) {
+        if (boot_disk.partitions[partition_index] == null) {
+            partition_index += 1;
+            continue;
+        }
+        // If this is a FAT12 partition (partition ID: 1)
+        if (boot_disk.partitions[partition_index].?.type == 1) {}
+        partition_index += 1;
+    }
 
     while (true) {}
 }
 
-extern fn asm_load_sector(
-    output_buffer: *anyopaque,
-    sector_index: u32,
-    disk_identifier: u32,
-) callconv(.c) void;
-
-extern fn asm_reset_display(
-    display_mode: u32,
-) callconv(.c) void;
-
-extern fn asm_write_text(
-    string: *const u8,
-    start_line: u32,
-    start_cell: u32,
-    color_codes: u32,
-) callconv(.c) void;
-
-extern fn asm_set_background(
-    color: u16,
-) callconv(.c) void;
+const assembly = @import("assembly.zig");
+const Disk = @import("Disk.zig");
+const Partition = @import("Partition.zig");

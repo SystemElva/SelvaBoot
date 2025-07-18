@@ -1,3 +1,4 @@
+; SPDX-License-Identifier: MPL-2.0
 
 section .text
 bits 16
@@ -68,4 +69,5 @@ asm_write_text:
 
 %include "disk.asm"
 %include "display.asm"
+%include "utility/memory.asm"
 

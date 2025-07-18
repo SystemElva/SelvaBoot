@@ -1,3 +1,4 @@
+; SPDX-License-Identifier: MPL-2.0
 
 global asm_set_background
 global asm_reset_display

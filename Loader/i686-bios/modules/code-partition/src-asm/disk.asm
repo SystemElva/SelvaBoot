@@ -1,3 +1,4 @@
+; SPDX-License-Identifier: MPL-2.0
 
 global asm_load_sector
 
@@ -53,6 +54,13 @@ asm_load_sector:
 
 .epilog:
     add     esp,                16
+
+    xor     ebx,                ebx
+    jnc     .no_error
+    mov     bl,                 ah
+
+.no_error:
+    mov     [esp + 28],         ebx
     popad
 
     mov esp, ebp
