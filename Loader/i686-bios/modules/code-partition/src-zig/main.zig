@@ -2,20 +2,15 @@
 
 /// This function must be the topmost code in 'main.zig'!
 export fn selvaboot_main(disk_identifier: u32) callconv(.c) noreturn {
+    assembly.asm_set_ds(0x3800);
     assembly.asm_reset_display(3);
     assembly.asm_set_background(0x40);
     assembly.asm_write_text(
-        &"ElvaBoot"[0],
+        &"SelvaBoot"[0],
         3,
         1,
         0x0f,
     );
-    assembly.memset(
-        @ptrFromInt(0x7c00),
-        0xff,
-        512,
-    );
-
     const boot_disk = Disk.init(@intCast(disk_identifier)) catch {
         while (true) {}
     };

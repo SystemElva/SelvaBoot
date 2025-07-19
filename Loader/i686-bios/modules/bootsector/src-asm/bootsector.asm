@@ -4,9 +4,9 @@ PARTITION_IDENTIFIER equ 0x9e
 bits 16
 org 0x7c00
 entry:
-    mov ebx, 0x800
+    mov ebx, 0x0800
     mov ss, ebx
-    mov ebp, 0x2000
+    mov ebp, 0xfff0
     mov esp, ebp
 
     xor eax, eax
@@ -126,7 +126,7 @@ load_partition:
     ; Segment Address
     mov cx, [di]
     shl cx, 5
-    add cx, 0x0a00
+    add cx, 0x3800
     ; mov ax, [di]
     ; shl ax, 4
     ; sub cx, ax
@@ -134,9 +134,9 @@ load_partition:
 
     push bp
     mov bp, sp
-    push dx
-    push bx
-    push cx
+    push dx ; Disk ID
+    push bx ; Offset
+    push cx ; Segment
     mov ax, [di + 4]
     add ax, [di]
     push ax
@@ -144,13 +144,12 @@ load_partition:
     mov sp, bp
     pop bp
 
+    ; Increment the sector index.
     mov ax, [di]
-    cmp ax, [di + 8]
-
-    ; Increment and write-back the sector index.
     inc ax
     mov [di], ax
-    
+    cmp ax, [di + 8]
+
     jb .loader_loop
 .finished:
     add sp, 16
@@ -158,11 +157,14 @@ load_partition:
 
 
 jump_to_partition:
+    ; Get the disk identifier (which actually only uses 8 bit)
     pop eax
+    ; Initialize stack frame
     push ebp
     mov ebp, esp
+    ; Call the code partition
     push eax
-    call 0xa00:0
+    call 0x3800:0
 
     cli
     hlt

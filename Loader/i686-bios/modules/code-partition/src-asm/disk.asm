@@ -1,20 +1,8 @@
 ; SPDX-License-Identifier: MPL-2.0
 
-global asm_load_sector
+global asm_load_sector_to_ds
 
-; asm_read_sector:
-;   Read a sector at a given logical block address (LBA).
-;
-; Arguments (3):
-;   [FURTHEST FROM EBP]
-;     2.  ptr32<[512]u8>                output_buffer
-;     1.  u32                           sector_index
-;     0.  u32                           disk_id             (only lower byte used)
-;   [NEAREST TO EBP]
-;
-; Return Value:
-;   N/A
-asm_load_sector:
+asm_load_sector_to_ds:
 .prolog:
     push ebp
     mov ebp, esp

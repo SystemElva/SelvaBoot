@@ -22,24 +22,7 @@ pub fn loadFromBuffer(
     };
 }
 
-pub fn loadFromDisk(
-    disk: *Disk,
-    partition_index: u32,
-) Disk.DiskError!Partition {
-    var master_boot_record: [512]u8 = .{0} ** 512;
-    try disk.loadSector(
-        disk,
-        &master_boot_record,
-        0,
-    );
-
-    return loadFromBuffer(
-        &master_boot_record,
-        partition_index,
-    );
-}
-
-pub fn loadSector(
+pub fn loadSectorToDs(
     self: *Partition,
     disk: *Disk,
     output_buffer: *[512]u8,
@@ -49,7 +32,55 @@ pub fn loadSector(
         return Disk.DiskError.SectorIndexTooHigh;
     }
 
-    try disk.loadSector(
+    try disk.loadSectorToDs(
+        output_buffer,
+        offset,
+    );
+}
+
+pub fn loadSectorToEs(
+    self: *Partition,
+    disk: *Disk,
+    output_buffer: *[512]u8,
+    offset: u64,
+) Disk.DiskError!void {
+    if (offset > self.length) {
+        return Disk.DiskError.SectorIndexTooHigh;
+    }
+
+    try disk.loadSectorToEs(
+        output_buffer,
+        offset,
+    );
+}
+
+pub fn loadSectorToFs(
+    self: *Partition,
+    disk: *Disk,
+    output_buffer: *[512]u8,
+    offset: u64,
+) Disk.DiskError!void {
+    if (offset > self.length) {
+        return Disk.DiskError.SectorIndexTooHigh;
+    }
+
+    try disk.loadSectorToFs(
+        output_buffer,
+        offset,
+    );
+}
+
+pub fn loadSectorToGs(
+    self: *Partition,
+    disk: *Disk,
+    output_buffer: *[512]u8,
+    offset: u64,
+) Disk.DiskError!void {
+    if (offset > self.length) {
+        return Disk.DiskError.SectorIndexTooHigh;
+    }
+
+    try disk.loadSectorToGs(
         output_buffer,
         offset,
     );
