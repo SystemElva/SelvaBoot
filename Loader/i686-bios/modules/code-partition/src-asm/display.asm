@@ -2,6 +2,7 @@
 
 global asm_set_background
 global asm_reset_display
+global asm_write_text
 
 FOREGROUND_BLACK         equ 0x00
 FOREGROUND_BLUE          equ 0x01
@@ -71,6 +72,56 @@ asm_reset_display:
     mov ah, 0x00
     mov al, [ebp + 0x08]
     int 0x10
+
+.epilog:
+    popad
+
+    mov esp, ebp
+    pop ebp
+    ret
+
+
+
+asm_write_text:
+.prolog:
+    push ebp
+    mov ebp, esp
+
+    pushad
+
+.setup_character_loop:
+    xor edi, edi
+
+.character_loop:
+    ; Check for primary exit condition (NUL character)
+    mov ebx, [ebp + 0x08]
+    add ebx, edi
+    mov cl, [ebx]
+    cmp cl, 0
+    je .epilog
+
+    ; Move Cursor
+    mov ah, 0x02            ; Interrupt Function (move cursor)
+    mov bh, 0               ; Display Page
+    mov dx, [ebp + 0x10]       ; Start Column
+    add dx, di
+    mov dh, [ebp + 0x0c]      ; Line
+    int 0x10
+
+    ; Check for secondary exit condition (line end reached)
+    cmp dl, 80
+    jae .epilog
+
+    ; Display the character
+    mov ah, 0x09
+    mov al, cl
+    mov bh, 0
+    mov bl, [ebp + 0x14]
+    mov cx, 1
+    int 0x10
+
+    inc edi
+    jmp .character_loop
 
 .epilog:
     popad
