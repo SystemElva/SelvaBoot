@@ -1,0 +1,6 @@
+{
+    "nasm.extraFlags": [
+        "-ILoader/i686-bios/modules/code-partition/src-asm"
+    ],
+    "nasm.checkOnType": true
+}

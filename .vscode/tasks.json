@@ -1,0 +1,17 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build SelvaBoot-i686",
+            "command": "${workspaceFolder}/Loader/i686-bios/do.sh",
+            "isBackground": true,
+            "args": [ "build" ]
+        },
+        {
+            "label": "Emulate SelvaBoot-i686 using QEMU",
+            "command": "${workspaceFolder}/Loader/i686-bios/do.sh",
+            "isBackground": true,
+            "args": [ "qemu" ]
+        }
+    ]
+}
